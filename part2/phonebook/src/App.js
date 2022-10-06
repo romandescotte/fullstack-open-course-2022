@@ -1,30 +1,7 @@
 import { useState } from 'react'
-
-const Search = ({onChange, value}) => {
-  return <>
-    <input onChange={onChange} value={value} />
-  </>
-}
-
-const PersonForm = ({handleNewNumber, handleNewName, onSubmit, name, number}) => { 
-  return <>
-    <form onSubmit={onSubmit}>
-      name: <input onChange={handleNewName} value={name} />
-      phone: <input onChange={handleNewNumber}  value={number} />
-      <button>add</button>
-    </form>
-  </>
-}
-
-const Persons = ({persons}) => {
-  return <>
-    <ul>
-      {persons.map(person => {
-        return <li key={person.name}>{person.name} {person.number}</li>
-      })}
-    </ul>  
-  </>
-}
+import Persons from './components/Persons'
+import Search from './components/Search'
+import PersonForm from './components/PersonForm'
 
 const App = () => {
 
@@ -83,7 +60,7 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>      
-      <Search onChange={handleSearch} value={search} />
+      filter shown with: <Search onChange={handleSearch} value={search} />
       <h2>Add a new</h2>
       <PersonForm handleNewName={handleNewName} handleNewNumber={handleNewNumber} onSubmit={handleSaveEntry} number={newEntry.number} name={newEntry.name} />
       <h2>Numbers</h2>      
