@@ -1,5 +1,11 @@
 import { useState } from 'react'
 
+const Search = ({onChange, value}) => {
+  return <>
+    <input onChange={onChange} value={value} />
+  </>
+}
+
 const PersonForm = ({handleNewNumber, handleNewName, onSubmit, name, number}) => { 
   return <>
     <form onSubmit={onSubmit}>
@@ -30,6 +36,7 @@ const App = () => {
   ]) 
 
   const [newEntry, setNewEntry] = useState({name: '', number: ''}) 
+  const [search, setSearch] = useState('')
 
   const handleNewName = (event) => {    
     setNewEntry({
@@ -64,14 +71,23 @@ const App = () => {
     }    
   }
 
+  const handleSearch = (event) => {
+    setSearch(event.target.value)
+  }
+
+  const filteredEntries = 
+    search ? 
+    persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())) 
+    : persons;
+
   return (
     <div>
       <h1>Phonebook</h1>      
+      <Search onChange={handleSearch} value={search} />
       <h2>Add a new</h2>
       <PersonForm handleNewName={handleNewName} handleNewNumber={handleNewNumber} onSubmit={handleSaveEntry} number={newEntry.number} name={newEntry.name} />
-      <div>debug newName: {newEntry.name} newPhone {newEntry.number}</div>            
-      <h2>Numbers</h2>
-      <Persons persons={persons} />
+      <h2>Numbers</h2>      
+      <Persons persons={filteredEntries} />
     </div>
   )
 }
