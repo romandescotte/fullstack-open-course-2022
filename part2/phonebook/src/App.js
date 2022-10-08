@@ -1,16 +1,26 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Persons from './components/Persons'
 import Search from './components/Search'
 import PersonForm from './components/PersonForm'
+import axios from 'axios'
 
 const App = () => {
 
-  const [persons, setPersons] = useState([    
-    { name: 'Arto Hellas', number: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
-  ]) 
+  console.log('inicio app()')
+  const [persons, setPersons] = useState([]) 
+
+  const hook = () => {
+    const url='http://localhost:3001/persons/'  
+    axios 
+      .get(url)
+      .then(response => {
+        console.log('respuesta fetch')
+        console.log(response.data)
+        setPersons(response.data)
+      })
+  }
+  useEffect(hook, [])
+
 
   const [newEntry, setNewEntry] = useState({name: '', number: ''}) 
   const [search, setSearch] = useState('')
@@ -64,7 +74,7 @@ const App = () => {
       <h2>Add a new</h2>
       <PersonForm handleNewName={handleNewName} handleNewNumber={handleNewNumber} onSubmit={handleSaveEntry} number={newEntry.number} name={newEntry.name} />
       <h2>Numbers</h2>      
-      <Persons persons={filteredEntries} />
+      <Persons persons={filteredEntries} /> 
     </div>
   )
 }
