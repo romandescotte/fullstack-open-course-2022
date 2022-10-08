@@ -21,7 +21,6 @@ const App = () => {
   }
   useEffect(hook, [])
 
-
   const [newEntry, setNewEntry] = useState({name: '', number: ''}) 
   const [search, setSearch] = useState('')
 
@@ -37,8 +36,7 @@ const App = () => {
       ...newEntry, 
       number: event.target.value
     }); 
-  }
-  
+  }  
 
   const handleSaveEntry = (event) => {
     event.preventDefault()
