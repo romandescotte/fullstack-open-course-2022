@@ -1,6 +1,31 @@
 import {useState, useEffect} from 'react'
 import axios from 'axios'
 
+const Weather = ({coord, countryName}) => {
+
+  const lat = coord[0];
+  const long = coord[1];
+  const api_key = process.env.REACT_APP_API_KEY;
+  const [weather, setWeather] = useState('');
+
+  useEffect(() => {
+    axios 
+      .get(`https://api.openweathermap.org/data/2.5/weather?&units=metric&lat=${lat}&lon=${long}&appid=${api_key}`)
+      .then(({data}) => { 
+        // console.log(data);
+        setWeather(data);
+      })     
+  },[])
+  return <>
+    <h3>Weather in {countryName}</h3>
+    <p>temperature: {weather.main.temp}° celcius</p>
+    <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} style={{width: 150 + 'px'}}></img>
+    <p>wind: {weather.wind.speed} m/s</p>
+    {console.log(weather)}
+  </>
+
+}
+
 const SearchCountry = ({handleSearch, value}) => {
   return <>
     <form>
@@ -43,16 +68,21 @@ const CountryDetails = ({filteredCountries}) => {
   const {area} = filteredCountries;
   const {languages} = filteredCountries;
   const {flags} = filteredCountries;
+  const {latlng} = filteredCountries;
+  const {capital} = filteredCountries;
+  
   
   return <>    
       <h2>{name.common}</h2>
       <p>Area code: {area}</p>
+      <p>capital: {capital}</p>
       <h3>Languages</h3>
       <ul>
         {Object.keys(languages).map((key) => <li key={languages[key]}>{languages[key]}</li>)}
       </ul>
       <h3>Flag: </h3>
       <div><img style={{width: 150+'px'}} src={flags.png} alt={name.common + ' flag'}></img></div>    
+      <Weather coord={latlng} countryName={name.common} />     
   </>
 }
 
