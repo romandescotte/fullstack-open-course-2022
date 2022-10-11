@@ -3,7 +3,6 @@ import Persons from './components/Persons'
 import Search from './components/Search'
 import PersonForm from './components/PersonForm'
 import contactsService from './services/contacts'
-import axios from 'axios'
 
 const App = () => {
 
@@ -13,8 +12,8 @@ const App = () => {
   useEffect(() => {
     contactsService.getAll()    
       .then(initialContacts => {
-        console.log('respuesta fetch')
-        console.log(initialContacts)
+        // console.log('respuesta fetch')
+        // console.log(initialContacts)
         setPersons(initialContacts)
       })
       .catch(error => console.error(`HTTP GET Failed: ${error}`))
@@ -22,6 +21,31 @@ const App = () => {
 
   const [newEntry, setNewEntry] = useState({name: '', number: ''}) 
   const [search, setSearch] = useState('')
+
+  const handleDeleteEntry = id => {
+    const {name} = persons.filter(person => person.id === id)[0]
+
+    const confirmation = window.confirm(`Are you sure you want to delete ${name}?`);
+
+    if(confirmation) {
+      deleteEntry()
+    }
+    const deleteEntry = () => {
+      return contactsService.deleteEntry(id)
+        .then(response => {
+          // console.log(response)
+          setPersons(prevState => prevState.filter(person => person.id !== id))
+        })
+        .catch(error => {
+          console.error(`HTTP DELETE Failed: ${error}`);
+          alert(
+            `the person '${name}' was already deleted from server`
+          )
+          setPersons(persons.filter(person => person.id !== id))
+        });
+    }     
+    
+  }
 
   const handleNewName = (event) => {    
     setNewEntry({
@@ -57,8 +81,25 @@ const App = () => {
           console.alert(`HTTP POST Failed: ${error}`)
         })
     } else {
-      alert(`{newEntry.name} is already added to phonebook`)
+      const person = persons.filter(person => person.name === newEntry.name);
+      console.log(person[0].id)
+      replaceEntry(person[0].id, newPerson)
     }    
+  }
+
+  const replaceEntry = (id, newPerson) => {
+    const confirmation = window.confirm(`${newEntry.name} already exists, do you want to replace the number?`)
+
+    if(confirmation) {
+      contactsService.updateEntry(id, newPerson)
+      .then(returnedPerson => {
+        // console.log(returnedPerson)        
+        setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
+      })
+      .catch(error => {
+        console.error(`HTTP PUT Failed: ${error}`);        
+      })
+    }
   }
 
   const handleSearch = (event) => {
@@ -77,7 +118,7 @@ const App = () => {
       <h2>Add a new</h2>
       <PersonForm handleNewName={handleNewName} handleNewNumber={handleNewNumber} onSubmit={handleSaveEntry} number={newEntry.number} name={newEntry.name} />
       <h2>Numbers</h2>      
-      <Persons persons={filteredEntries} /> 
+      <Persons persons={filteredEntries} handleDeleteEntry={handleDeleteEntry} /> 
     </div>
   )
 }
