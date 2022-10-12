@@ -1,0 +1,23 @@
+/*Notification*/
+
+.error {
+  color: red;
+  background: lightgrey;
+  font-size: 20px;
+  border: 3px solid red;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  
+}
+
+.succeed {
+  color: green;
+  background: lightgrey;
+  font-style: 'italic';
+  font-size: 20px;
+  border: 3px solid green;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}

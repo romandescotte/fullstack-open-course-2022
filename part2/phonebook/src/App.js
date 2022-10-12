@@ -4,10 +4,38 @@ import Search from './components/Search'
 import PersonForm from './components/PersonForm'
 import contactsService from './services/contacts'
 
+const ErrorNotification = ({errorMessage}) => {
+
+  if(errorMessage === '') {
+    return null
+  }
+
+  return <>
+    <div className='error'>
+      {errorMessage}
+    </div>
+  </>
+}
+
+const SucceedNotification = ({succedMessage}) => {
+
+  if(succedMessage === '') {
+    return null
+  }
+
+  return <>
+    <div className='succeed'>
+      {succedMessage}
+    </div>
+  </>
+}
+
 const App = () => {
 
   console.log('inicio app()');
   const [persons, setPersons] = useState([]);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [succeedMessage, setSucceedMessage] = useState('');
 
   useEffect(() => {
     contactsService.getAll()    
@@ -27,9 +55,6 @@ const App = () => {
 
     const confirmation = window.confirm(`Are you sure you want to delete ${name}?`);
 
-    if(confirmation) {
-      deleteEntry()
-    }
     const deleteEntry = () => {
       return contactsService.deleteEntry(id)
         .then(response => {
@@ -37,14 +62,18 @@ const App = () => {
           setPersons(prevState => prevState.filter(person => person.id !== id))
         })
         .catch(error => {
-          console.error(`HTTP DELETE Failed: ${error}`);
-          alert(
-            `the person '${name}' was already deleted from server`
-          )
+          console.error(`HTTP DELETE Failed: ${error}`);         
+          setErrorMessage(`Information of '${name}' has already been removed from server`)
+          setTimeout(() => {
+            setErrorMessage('')
+          }, 5000)
           setPersons(persons.filter(person => person.id !== id))
         });
     }     
-    
+
+    if(confirmation) {
+      deleteEntry()
+    }    
   }
 
   const handleNewName = (event) => {    
@@ -72,11 +101,15 @@ const App = () => {
       contactsService.create(newPerson)
         .then(returnedContact => {
           setPersons(persons.concat(returnedContact));
+          setSucceedMessage(`Added ${newEntry.name}`);
+          setTimeout(() => {
+            setSucceedMessage('')
+          }, 5000)
           setNewEntry({
             name: '', 
             number: ''
           });
-        })
+        })        
         .catch(error => {
           console.alert(`HTTP POST Failed: ${error}`)
         })
@@ -114,6 +147,8 @@ const App = () => {
   return (
     <div>
       <h1>Phonebook</h1>      
+      <ErrorNotification errorMessage={errorMessage} />
+      <SucceedNotification succedMessage={succeedMessage} />
       filter shown with: <Search onChange={handleSearch} value={search} />
       <h2>Add a new</h2>
       <PersonForm handleNewName={handleNewName} handleNewNumber={handleNewNumber} onSubmit={handleSaveEntry} number={newEntry.number} name={newEntry.name} />
