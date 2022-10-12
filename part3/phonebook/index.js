@@ -33,12 +33,22 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/info', (request, response) => {
-
   const notesPersons = persons.length;
   const timeStamp = new Date().toString();
   const info = `Phonebook has info for ${notesPersons} people <br /> ${timeStamp}`;  
   response.send(`<p>${info}</p>`)
 })
+
+app.get('/api/persons/:id', (request, response) => {
+  const id = Number(request.params.id);
+  const person = persons.filter(person => person.id === id);
+  
+  if(person.length !== 0) {
+    response.status(200).json(person);    
+  } 
+  response.status(404).end();  
+})
+
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
