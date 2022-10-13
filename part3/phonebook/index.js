@@ -57,16 +57,28 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons/', (request, response) => {
+  
   const id = Math.floor(Math.random()* 1000);
-  const person = request.body;
+  const body = request.body;
   const newEntry = {
     'id': id,
-    'name': person.name,
-    'number': person.number
+    'name': body.name,
+    'number': body.number
   }
+  if(!body.name || !body.number) {
+    response.status(400).json({
+      error: 'Content missing in the request'
+    });
+  } 
 
-  persons = persons.concat(newEntry);
-  console.log(response.body)
+  if(persons.map(person => person.name).includes(newEntry.name)) {
+    response.status(400).json({
+      error: 'Name must be unique'
+    });
+  };
+  
+
+  persons = persons.concat(newEntry);  
   response.status(200).json(newEntry);
 })
 
