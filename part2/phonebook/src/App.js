@@ -51,14 +51,15 @@ const App = () => {
   const [search, setSearch] = useState('')
 
   const handleDeleteEntry = id => {
-    const {name} = persons.filter(person => person.id === id)[0]
-
+    
+    const {name} = persons.filter(person => person.id === id)[0];
+    // console.log('deletedPerson', name);
     const confirmation = window.confirm(`Are you sure you want to delete ${name}?`);
-
-    const deleteEntry = () => {
+    const idParsed = Number(id);
+    const deleteNumber = id => {
       return contactsService.deleteEntry(id)
         .then(response => {
-          // console.log(response)
+          // console.log('delete response', response)
           setPersons(prevState => prevState.filter(person => person.id !== id))
         })
         .catch(error => {
@@ -72,7 +73,7 @@ const App = () => {
     }     
 
     if(confirmation) {
-      deleteEntry()
+      deleteNumber(idParsed)
     }    
   }
 

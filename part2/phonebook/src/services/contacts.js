@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseURL = 'http://localhost:3001/api/persons/'
+const baseURL = 'https://ancient-feather-1118.fly.dev/api/persons/'
 
 const getAll = () => {
   const request = axios.get(baseURL);
