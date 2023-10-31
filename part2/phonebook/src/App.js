@@ -116,8 +116,8 @@ const App = () => {
         })
     } else {
       const person = persons.filter(person => person.name === newEntry.name);
-      console.log(person[0].id)
-      replaceEntry(person[0].id, newPerson)
+      // console.log(person[0].id)
+      // replaceEntry(person[0].id, newPerson)
     }    
   }
 

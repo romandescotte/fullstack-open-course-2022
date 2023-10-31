@@ -1,29 +1,46 @@
 import {useState, useEffect} from 'react'
 import axios from 'axios'
 
-const Weather = ({coord, countryName}) => {
+const Weather = ({coord, countryName, filteredCountries}) => {
+
+  const [weather, setWeather] = useState({});  
+  const [loading, setLoading] = useState(false);
 
   const lat = coord[0];
   const long = coord[1];
   const api_key = process.env.REACT_APP_API_KEY;
-  const [weather, setWeather] = useState('');
+  
+  useEffect(() => {    
+   
+    if(filteredCountries) {
+      let ignore = false;
 
-  useEffect(() => {
-    axios 
-      .get(`https://api.openweathermap.org/data/2.5/weather?&units=metric&lat=${lat}&lon=${long}&appid=${api_key}`)
-      .then(({data}) => { 
-        // console.log(data);
-        setWeather(data);
-      })     
+      const baseUrl = `https://api.openweathermap.org/data/2.5/weather?&units=metric`
+      setLoading(true);
+        axios 
+        .get(`${baseUrl}&lat=${lat}&lon=${long}&appid=${api_key}`)
+        .then(res => { 
+          if(!ignore) {           
+            setWeather(res.data);
+            setLoading(false);
+          }             
+        })
+        .catch(err => console.log(err))  
+        return () => {
+          ignore = true;
+        }
+    }
+      
   },[])
-  return <>
-    <h3>Weather in {countryName}</h3>
-    <p>temperature: {weather.main.temp}° celcius</p>
-    <img src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} style={{width: 150 + 'px'}}></img>
-    <p>wind: {weather.wind.speed} m/s</p>
-    {console.log(weather)}
-  </>
 
+  if (weather.main) {
+    return <>
+      <h3>Weather in {countryName}</h3>
+      <p>Temperature: {weather.main.temp}° celcius</p>
+      <img alt={`${countryName} flag`} src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`} style={{width: 150 + 'px'}}></img>
+      <p>wind: {weather.wind.speed} m/s</p>
+    </>
+  }  
 }
 
 const SearchCountry = ({handleSearch, value}) => {
@@ -37,9 +54,9 @@ const SearchCountry = ({handleSearch, value}) => {
 const Countries = ({filteredCountries, search}) => {  
 
   const [showDetails, setShowDetails] = useState();
-
+  
   useEffect(() => {    
-    setShowDetails(new Array(filteredCountries.length).fill(false));    
+    setShowDetails(new Array(filteredCountries.length).fill(false)); 
   }, [search]);
 
   const handleShowDetails = (position) => {    
@@ -50,16 +67,17 @@ const Countries = ({filteredCountries, search}) => {
       return item;    
     })  
     setShowDetails(updatedShowDetails);
-  }
+  }  
 
   if(filteredCountries.length === 1) {
-    return <CountryDetails filteredCountries={filteredCountries[0]} />
+    return <CountryDetails filteredCountries={filteredCountries[0]}/>
   }
   if(filteredCountries.length <= 10) {    
     return filteredCountries.map((country, index) => <CountryList key={country.name.common} country={country.name.common} handleShowDetails={() => handleShowDetails(index)} position={index} showDetails={showDetails} filteredCountries={filteredCountries} />)     
   } else {
     return <p>Too many matches, specify another filter</p>
   }  
+  
 }
 
 const CountryDetails = ({filteredCountries}) => {  
@@ -69,8 +87,7 @@ const CountryDetails = ({filteredCountries}) => {
   const {languages} = filteredCountries;
   const {flags} = filteredCountries;
   const {latlng} = filteredCountries;
-  const {capital} = filteredCountries;
-  
+  const {capital} = filteredCountries;  
   
   return <>    
       <h2>{name.common}</h2>
@@ -82,17 +99,17 @@ const CountryDetails = ({filteredCountries}) => {
       </ul>
       <h3>Flag: </h3>
       <div><img style={{width: 150+'px'}} src={flags.png} alt={name.common + ' flag'}></img></div>    
-      <Weather coord={latlng} countryName={name.common} />     
+      <Weather coord={latlng} countryName={name.common} filteredCountries = {filteredCountries} />     
   </>
 }
 
-const CountryList = ({country, handleShowDetails, showDetails, position, filteredCountries}) => {
+const CountryList = ({country, handleShowDetails, showDetails, position, filteredCountries}) => {  
   return <> 
     <div>{country}
       <button onClick={handleShowDetails}>
         {
           showDetails[position] ? 'hide' : 'show'
-        }
+        }       
       </button>
         {
           showDetails[position] ? <CountryDetails filteredCountries={filteredCountries[position]} /> : ''       
@@ -107,12 +124,12 @@ const App = () => {
   const [search, setSearch] = useState('');
   const [filteredCountries, setFilteredCountries] = useState([]);
   
-  const fetchCountries = () => {
+  const fetchCountries = () => {   
     const url = 'https://restcountries.com/v3.1/all'
     axios 
       .get(url)
       .then(response => {     
-        console.log('Fetching done!');
+        console.log('Fetching countries done!');
         setCountriesList(response.data);
       })
   };
@@ -123,9 +140,11 @@ const App = () => {
     setSearch(event.target.value);
   };
   
-  const handleFilteredCountries = () => {    
-    const result = countriesList.filter(country => country.name.common.toLowerCase().includes(search.toLowerCase()));
-    setFilteredCountries(result);   
+  const handleFilteredCountries = () => {  
+    if(search) {
+      const result = countriesList.filter(country => country.name.common.toLowerCase().includes(search.toLowerCase()));
+      setFilteredCountries(result);   
+    }   
   }    
 
   useEffect(handleFilteredCountries, [search]);
@@ -137,5 +156,7 @@ const App = () => {
     </div>
   );
 }
+
+
 
 export default App;

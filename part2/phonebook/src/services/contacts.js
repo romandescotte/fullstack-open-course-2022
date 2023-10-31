@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseURL = 'https://ancient-feather-1118.fly.dev/api/persons/'
+const baseURL = '/persons'
 
 const getAll = () => {
   const request = axios.get(baseURL);
@@ -26,5 +26,5 @@ export default {
   getAll, 
   create,
   deleteEntry,
-  updateEntry
+  // updateEntry
 }
