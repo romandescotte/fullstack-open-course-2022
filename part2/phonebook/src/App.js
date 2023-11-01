@@ -5,11 +5,9 @@ import PersonForm from './components/PersonForm'
 import contactsService from './services/contacts'
 
 const ErrorNotification = ({errorMessage}) => {
-
   if(errorMessage === '') {
     return null
   }
-
   return <>
     <div className='error'>
       {errorMessage}
@@ -18,11 +16,9 @@ const ErrorNotification = ({errorMessage}) => {
 }
 
 const SucceedNotification = ({succedMessage}) => {
-
   if(succedMessage === '') {
     return null
   }
-
   return <>
     <div className='succeed'>
       {succedMessage}
@@ -51,29 +47,24 @@ const App = () => {
 
   const handleDeleteEntry = id => {
     
-    const {name} = persons.filter(person => person.id === id)[0];
-    // console.log('deletedPerson', name);
+    const {name} = persons.filter(person => person.id === id)[0];   
     const confirmation = window.confirm(`Are you sure you want to delete ${name}?`);
     const idParsed = Number(id);
-    const deleteNumber = id => {
-      return contactsService.deleteEntry(id)
-        .then(response => {
-          // console.log('delete response', response)
-          setPersons(prevState => prevState.filter(person => person.id !== id))
-        })
-        .catch(error => {
-          console.error(`HTTP DELETE Failed: ${error}`);         
-          setErrorMessage(`Information of '${name}' has already been removed from server`)
-          setTimeout(() => {
-            setErrorMessage('')
-          }, 5000)
-          setPersons(persons.filter(person => person.id !== id))
-        });
-    }     
 
     if(confirmation) {
-      deleteNumber(idParsed)
-    }    
+      contactsService.deleteEntry(idParsed)
+      .then(response => {         
+        setPersons(prevState => prevState.filter(person => person.id !== idParsed))         
+        setSucceedMessage(`Information of '${name}' has been removed from server`)
+        setTimeout(() => {
+          setSucceedMessage('')
+        }, 3000)
+      })
+      .catch(error => {
+        console.error(`HTTP DELETE Failed: ${error}`);
+        setPersons(persons.filter(person => person.id !== idParsed))
+      });
+    }
   }
 
   const handleNewName = (event) => {    
@@ -100,11 +91,12 @@ const App = () => {
     if(!persons.map(person => person.name).includes(newEntry.name)) {
       contactsService.create(newPerson)
         .then(returnedContact => {
-          setPersons(persons.concat(returnedContact));
+          setPersons(persons.concat(returnedContact));          
           setSucceedMessage(`Added ${newEntry.name}`);
           setTimeout(() => {
             setSucceedMessage('')
-          }, 5000)
+          }, 3000);
+          
           setNewEntry({
             name: '', 
             number: ''
@@ -117,21 +109,24 @@ const App = () => {
       const person = persons.filter(person => person.name === newEntry.name);
       const id= person[0].id;     
       const confirmation = window.confirm(`${newEntry.name} already exists, do you want to replace the number?`)
-      if(confirmation) {
+      if(confirmation) {        
         contactsService.updateEntry(id, newPerson)
           .then(returnedPerson => {                 
             setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
             setSucceedMessage(`Updated number for: ${newEntry.name}`);
           })
           .catch(error => {
-            console.error(`HTTP PUT Failed: ${error}`);        
+            console.log(error);
+            setErrorMessage(`Information of '${newEntry.name}' has already been removed from server`)
+
+            setTimeout(() => {
+              setErrorMessage('')
+            }, 3000)
+            setPersons(persons.filter(person => person.id !== id))  
           })
       }
-      
     }    
   }
-
-
 
   const handleSearch = (event) => {
     setSearch(event.target.value)
