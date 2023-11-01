@@ -32,7 +32,6 @@ const SucceedNotification = ({succedMessage}) => {
 
 const App = () => {
 
-  console.log('inicio app()');
   const [persons, setPersons] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [succeedMessage, setSucceedMessage] = useState('');
@@ -116,25 +115,23 @@ const App = () => {
         })
     } else {
       const person = persons.filter(person => person.name === newEntry.name);
-      // console.log(person[0].id)
-      // replaceEntry(person[0].id, newPerson)
+      const id= person[0].id;     
+      const confirmation = window.confirm(`${newEntry.name} already exists, do you want to replace the number?`)
+      if(confirmation) {
+        contactsService.updateEntry(id, newPerson)
+          .then(returnedPerson => {                 
+            setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
+            setSucceedMessage(`Updated number for: ${newEntry.name}`);
+          })
+          .catch(error => {
+            console.error(`HTTP PUT Failed: ${error}`);        
+          })
+      }
+      
     }    
   }
 
-  const replaceEntry = (id, newPerson) => {
-    const confirmation = window.confirm(`${newEntry.name} already exists, do you want to replace the number?`)
 
-    if(confirmation) {
-      contactsService.updateEntry(id, newPerson)
-      .then(returnedPerson => {
-        // console.log(returnedPerson)        
-        setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
-      })
-      .catch(error => {
-        console.error(`HTTP PUT Failed: ${error}`);        
-      })
-    }
-  }
 
   const handleSearch = (event) => {
     setSearch(event.target.value)
