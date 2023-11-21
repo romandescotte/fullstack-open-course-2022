@@ -71,7 +71,7 @@ describe('totalLikes', () => {
     }  
   ]
 
-  // noBlogList = []
+  noBlogList = []
 
   test('when list has only one blog, equals the likes of that', () => {
     console.log(listWithOneBlog.length)
@@ -84,10 +84,10 @@ describe('totalLikes', () => {
     expect(result).toBe(36)
   })
 
-  // test('when list is empty returns undefined', () => {
-  //   const result = listHelper.totalLikes(noBlogList)
-  //   expect(result).toBe(0)
-  // })
+  test('when list is empty returns undefined', () => {
+    const result = listHelper.totalLikes(noBlogList)
+    expect(result).toBe(0)
+  })
   
 })
 
