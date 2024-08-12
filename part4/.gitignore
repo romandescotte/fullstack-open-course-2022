@@ -1,3 +1,5 @@
 /node_modules
 # original.js es el archivo desde donde se divide el codigo en modulos, queda ahi como referencia
 original.js
+.env
+list_helper.test-ignorado.js
