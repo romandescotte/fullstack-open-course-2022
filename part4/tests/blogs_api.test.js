@@ -103,6 +103,16 @@ test.only('if title or uri are missing backend responds with 400 Bad Request', a
     .expect(400)
 })
 
+test.only('delete single post deletes that post', async() => {
+  const {body: blogs} = await api
+    .get('/api/blogs')
+
+  const blogToDelete = blogs[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+})
 
 after(async () => {
   await mongoose.connection.close()

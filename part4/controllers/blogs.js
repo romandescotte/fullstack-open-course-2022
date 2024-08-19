@@ -34,10 +34,17 @@ blogsRouter.post('/api/blogs', async (request, response) => {
     }
   } catch(exception) {
     next(exception)
-  }
+  }  
   
+})
 
-  
+blogsRouter.delete('/api/blogs/:id', async(request, response) => {
+  try {
+    await Blog.findByIdAndDelete(request.params.id)
+    response.status(204).end()
+  } catch(exception) {
+    next(exception)
+  }
 })
 
 
