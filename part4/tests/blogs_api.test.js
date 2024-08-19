@@ -109,6 +109,12 @@ test.only('delete single post deletes that post', async() => {
   await api
     .delete(`/api/blogs/${blogToDelete.id}`)
     .expect(204)
+
+  const blogs2 = await helper.blogsInDB()
+
+  assert.notDeepStrictEqual(blogs2[0].id, blogToDelete.id)  
+  assert.strictEqual(blogs.length - 1, blogs2.length )
+  
 })
 
 test.only('update likes succeeds with a valid id', async() => {
