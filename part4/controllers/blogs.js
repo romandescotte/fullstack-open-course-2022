@@ -9,7 +9,7 @@ blogsRouter.get('/api/blogs', async (request, response) => {
     // console.log('operation returned the following blogs', blogs)
     response.json(blogs)
   } catch(exception) {
-    next(exception)
+    logger.error(exception)
   }
      
 })
@@ -33,7 +33,7 @@ blogsRouter.post('/api/blogs', async (request, response) => {
       response.status(201).json(savedBlog)
     }
   } catch(exception) {
-    next(exception)
+    logger.error(exception)
   }  
   
 })
@@ -43,7 +43,7 @@ blogsRouter.delete('/api/blogs/:id', async(request, response) => {
     await Blog.findByIdAndDelete(request.params.id)
     response.status(204).end()
   } catch(exception) {
-    next(exception)
+    logger.error(exception)
   }
 })
 
@@ -57,7 +57,7 @@ blogsRouter.put('/api/blogs/:id', async(request, response) => {
     const updatedNote = await Blog.findByIdAndUpdate(request.params.id, blog, {new: true})
     response.status(201).json(updatedNote)
   } catch(exception) {
-    next(exception)
+    logger.error(exception)
   }
 })
 

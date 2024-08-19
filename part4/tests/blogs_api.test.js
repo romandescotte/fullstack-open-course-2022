@@ -17,7 +17,7 @@ beforeEach(async() => {
   await blogObject.save()
 })
 
-test.only('notes are returned as json', async() => {
+test('notes are returned as json', async() => {
   await api
     .get('/api/blogs')
     .expect(200)
@@ -25,7 +25,7 @@ test.only('notes are returned as json', async() => {
     
 })
 
-test.only('id is the unique identifier property of the blogs', async() => {
+test('id is the unique identifier property of the blogs', async() => {
   const blogs = await helper.blogsInDB()
       
   blogs.forEach( (blog, i) => {    
@@ -34,7 +34,7 @@ test.only('id is the unique identifier property of the blogs', async() => {
   })
 })
 
-test.only('a new valid blog can be added to api/blogs', async() => {
+test('a new valid blog can be added to api/blogs', async() => {
   
   const newBlog = {
     author: 'asde',
@@ -61,7 +61,7 @@ test.only('a new valid blog can be added to api/blogs', async() => {
   assert(Object.values(lastAddedBlog).includes(newBlog.likes))
 })
 
-test.only('if likes value is not present it will default to 0', async() => {
+test('if likes value is not present it will default to 0', async() => {
   const newBlog = {
     author: 'asd',
     title: 'asd',
@@ -80,7 +80,7 @@ test.only('if likes value is not present it will default to 0', async() => {
   assert.strictEqual(blogsAtEnd[2].likes, 0)  
 })
 
-test.only('if title or uri are missing backend responds with 400 Bad Request', async() => {
+test('if title or uri are missing backend responds with 400 Bad Request', async() => {
   const blogNoTitle = {
     author: 'asd',
     url: 'www.asd.com'
@@ -101,7 +101,7 @@ test.only('if title or uri are missing backend responds with 400 Bad Request', a
     .expect(400)
 })
 
-test.only('delete single post deletes that post', async() => {
+test('delete single post deletes that post', async() => {
   const blogs = await helper.blogsInDB()
 
   const blogToDelete = blogs[0]
@@ -117,7 +117,7 @@ test.only('delete single post deletes that post', async() => {
   
 })
 
-test.only('update likes succeeds with a valid id', async() => {
+test('update likes succeeds with a valid id', async() => {
 
   const updateLikes = {
     likes: 20
