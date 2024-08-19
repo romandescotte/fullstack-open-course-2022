@@ -41,8 +41,6 @@ test.only('notes are returned as json', async() => {
     
 })
 
-
-
 test.only('id is the unique identifier property of the blogs', async() => {
   const { body:blogs } = await api 
     .get('/api/blogs')   
@@ -53,6 +51,33 @@ test.only('id is the unique identifier property of the blogs', async() => {
   })
 })
 
+test.only('a new valid blog can be added to api/blogs', async() => {
+  
+  const newBlog = {
+    author: 'asde',
+    title: 'asd',
+    url: 'www.asd.com',
+    likes: 0
+  }
+  
+  const blogs = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api
+    .get('/api/blogs')  
+
+  assert.strictEqual(response.body.length, initialBlogs.length + 1)
+
+  const lastAddedBlog = response.body[response.body.length - 1]
+
+  assert(Object.values(lastAddedBlog).includes(newBlog.author ))
+  assert(Object.values(lastAddedBlog).includes(newBlog.title))
+  assert(Object.values(lastAddedBlog).includes(newBlog.url))
+  assert(Object.values(lastAddedBlog).includes(newBlog.likes))
+})
 
 
 after(async () => {
