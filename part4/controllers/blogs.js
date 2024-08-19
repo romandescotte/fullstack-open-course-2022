@@ -4,7 +4,7 @@ const logger = require('../utils/logger')
 
 blogsRouter.get('/api/blogs', async (request, response) => {
   const blogs = await Blog.find({})
-  console.log('operation returned the following blogs', blogs)
+  // console.log('operation returned the following blogs', blogs)
   response.json(blogs)
    
 })
