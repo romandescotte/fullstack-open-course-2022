@@ -79,6 +79,25 @@ test.only('a new valid blog can be added to api/blogs', async() => {
   assert(Object.values(lastAddedBlog).includes(newBlog.likes))
 })
 
+test.only('if likes value is not present it will default to 0', async() => {
+  const newBlog = {
+    author: 'asd',
+    title: 'asd',
+    url: 'www.asd.com',    
+  }
+
+  const blogs = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api
+    .get('/api/blogs')
+
+  assert.strictEqual(response.body[2].likes, 0)  
+})
+
 
 after(async () => {
   await mongoose.connection.close()
