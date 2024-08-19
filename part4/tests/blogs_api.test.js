@@ -114,6 +114,27 @@ test.only('delete single post deletes that post', async() => {
     .expect(204)
 })
 
+test.only('update likes succeeds with a valid id', async() => {
+
+  const updateLikes = {
+    likes: 20
+  }
+  const {body: blogs} = await api
+    .get('/api/blogs')
+  
+  const blogToUpdate = blogs[0]
+
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updateLikes)
+    .expect(201)
+  
+  const {body: blogsAtEnd} = await api
+    .get('/api/blogs')
+
+  assert.strictEqual(blogsAtEnd[0].likes, updateLikes.likes)
+} )
+
 after(async () => {
   await mongoose.connection.close()
 })
