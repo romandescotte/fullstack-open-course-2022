@@ -19,9 +19,15 @@ blogsRouter.post('/api/blogs', async (request, response) => {
     likes: body.likes || 0
   })
 
-  const savedBlog = await blog.save()
+  if(!blog.title || !blog.url) {
+    response.status(400).end("No title or url present")
+  } else {
+    const savedBlog = await blog.save()
    
-  response.status(201).json(savedBlog)
+    response.status(201).json(savedBlog)
+  }
+
+  
 })
 
 

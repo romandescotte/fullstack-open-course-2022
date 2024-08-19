@@ -4,6 +4,7 @@ const Blog = require('../models/blog')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
+const blog = require('../models/blog')
 const api = supertest(app)
 
 const initialBlogs = [
@@ -96,6 +97,27 @@ test.only('if likes value is not present it will default to 0', async() => {
     .get('/api/blogs')
 
   assert.strictEqual(response.body[2].likes, 0)  
+})
+
+test.only('if title or uri are missing backend responds with 400 Bad Request', async() => {
+  const blogNoTitle = {
+    author: 'asd',
+    url: 'www.asd.com'
+  }
+  const blogNoURL = {
+    author: 'asd',
+    title: 'asd'
+  }
+  const blogs = await api
+    .post('/api/blogs')
+    .send(blogNoTitle)
+    .expect(400)  
+
+
+  const blogs2 = await api
+    .post('/api/blogs')
+    .send(blogNoURL)
+    .expect(400)
 })
 
 
