@@ -35,7 +35,7 @@ describe('when there is initially one user in db', () => {
     await api
       .post('/api/users')
       .send(existingUser)
-      // .expect(400)  
+      .expect(400)  
 
     const finalUsers = await usersInDB()
     console.log(finalUsers)
@@ -55,10 +55,11 @@ describe('when creating a new user', () => {
       name: 'R'
     }
       
-    await api
+   await api
       .post('/api/users')
       .send(user)
-      .expect(400)      
+      .expect(400)
+   
   })
 
   test('test fails if username is shorter than 3 characters long', async() => {
