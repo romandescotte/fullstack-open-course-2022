@@ -1,4 +1,3 @@
-
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
@@ -22,18 +21,21 @@ const initialBlogs = [
   }
 ]
 
-const initialUsers = [
+const initialUsers = async() =>  {
+  const users =  [
     {
       username: 'root',
-      passwordHash:  async() => await bcrypt.hash('1234', 10),
+      passwordHash: await bcrypt.hash('1234', 10),
       name: 'Romancio'
     },
     {
       username: 'admin',
-      passwordHash:  async() => await bcrypt.hash('2345', 10),
+      passwordHash: await bcrypt.hash('2345', 10),
       name: 'Romancete'
     }
-]
+  ]
+  return users
+}
 
 const blogsInDB = async () => {
   const blogs = await Blog.find({})
