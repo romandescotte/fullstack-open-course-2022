@@ -5,10 +5,8 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
-// const helper = require('./blogs_api_helper')
 const bcrypt = require('bcrypt')
 const { usersInDB } = require('./helper')
-
 
 
 describe('when there is initially one user in db', () => {
@@ -49,6 +47,9 @@ describe('when creating a new user', () => {
   })
 
   test('test fails if password is shorter than 3 characters long', async() => {
+
+    const usersAtBeginning = await usersInDB()
+
     const user = {
       username: 'root',
       password: '12',
@@ -58,11 +59,17 @@ describe('when creating a new user', () => {
    await api
       .post('/api/users')
       .send(user)
-      .expect(400)
-   
+      .expect(400)  
+
+    const usersAtEnd = await usersInDB()
+
+    assert.strictEqual(usersAtEnd.length, usersAtBeginning.length)
   })
 
   test('test fails if username is shorter than 3 characters long', async() => {
+
+    const usersAtBeginning = await usersInDB()
+
     const user = {
       username: 'rt',
       password: '1234',
@@ -72,7 +79,11 @@ describe('when creating a new user', () => {
     await api
       .post('/api/users')
       .send(user)
-      .expect(400)      
+      .expect(400)   
+
+    const usersAtEnd = await usersInDB()
+
+    assert.strictEqual(usersAtEnd.length, usersAtBeginning.length)
   })
 })
 
