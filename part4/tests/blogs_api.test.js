@@ -1,6 +1,7 @@
 const {test, after, beforeEach} = require('node:test')
 const assert = require('node:assert')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
@@ -8,16 +9,25 @@ const api = supertest(app)
 const helper = require('./helper')
 
 
-
 beforeEach(async() => {
   await Blog.deleteMany({})
+
   let blogObject = new Blog(helper.initialBlogs[0])
   await blogObject.save()
+
   blogObject = new Blog(helper.initialBlogs[1])
   await blogObject.save()
+
+  await User.deleteMany({})
+  
+  let userObject = new User(await helper.initialUsers[0]) 
+  await userObject.save()
+
+  userObject = new User(await helper.initialUsers[1])
+  await userObject.save()  
 })
 
-test('notes are returned as json', async() => {
+test('blogs are returned as json', async() => {
   await api
     .get('/api/blogs')
     .expect(200)
@@ -35,12 +45,15 @@ test('id is the unique identifier property of the blogs', async() => {
 })
 
 test('a new valid blog can be added to api/blogs', async() => {
-  
+
+  const createdUser = await User.find({username: 'root'})
+   
   const newBlog = {
     author: 'asde',
     title: 'asd',
     url: 'www.asd.com',
-    likes: 0
+    likes: 0,
+    userId: `${createdUser[0]._id.toString()}`
   }
   
   await api
@@ -62,10 +75,14 @@ test('a new valid blog can be added to api/blogs', async() => {
 })
 
 test('if likes value is not present it will default to 0', async() => {
+
+  const createdUser = await User.find({username: 'root'})
+
   const newBlog = {
     author: 'asd',
     title: 'asd',
-    url: 'www.asd.com',    
+    url: 'www.asd.com',   
+    userId: `${createdUser[0]._id.toString()}`
   }
 
   await api
@@ -81,19 +98,24 @@ test('if likes value is not present it will default to 0', async() => {
 })
 
 test('if title or uri are missing backend responds with 400 Bad Request', async() => {
+
+  const createdUser = await User.find({username: 'root'})
+
   const blogNoTitle = {
     author: 'asd',
-    url: 'www.asd.com'
+    url: 'www.asd.com',
+    userId: `${createdUser[0]._id.toString()}`
   }
   const blogNoURL = {
     author: 'asd',
-    title: 'asd'
+    title: 'asd',
+    userId: `${createdUser[0]._id.toString()}`
   }
+
   await api
     .post('/api/blogs')
     .send(blogNoTitle)
     .expect(400)  
-
 
   await api
     .post('/api/blogs')

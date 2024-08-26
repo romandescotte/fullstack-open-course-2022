@@ -17,32 +17,30 @@ blogsRouter.get('/api/blogs', async (request, response) => {
      
 })
 
-blogsRouter.post('/api/blogs', async (request, response) => {
+blogsRouter.post('/api/blogs', async (request, response, next) => {
   
-
   const body = request.body
-  const user = await User.findById(body.userId) 
-
-  const blog = new Blog({
-    author: body.author,
-    title: body.title,
-    url: body.url,
-    likes: body.likes || 0,
-    user: user.id
-  })
 
   try {
+    const user = await User.findById(body.userId) 
+    const blog = new Blog({
+      author: body.author,
+      title: body.title,
+      url: body.url,
+      likes: body.likes || 0,
+      user: user.id
+    })
     if(!blog.title || !blog.url) {
-      response.status(400).end("No title or url present")
-    } else {
-      const savedBlog = await blog.save()
-      user.blogs = user.blogs.concat(savedBlog._id)
-      await user.save()
-      response.status(201).json(savedBlog)
-    }
+      response.status(400).json({error: "No title or url present"})
+    } 
+    const savedBlog = await blog.save()
+    user.blogs = user.blogs.concat(savedBlog._id)
+    const savedUser = await user.save()   
+    response.status(201).json(savedBlog)
+
   } catch(exception) {
-    logger.error(exception)
-  }  
+    next(exception)
+  }
   
 })
 
