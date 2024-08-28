@@ -1,9 +1,10 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: 
 
 {
-	"author": "asd",	
-	"title": "asd",
-	"url": "asd",
-	"likes": 0
+	"author": "Roman",	
+	"title": "Creando tenticado",
+	"url": "www.blog.com",
+	"likes": 100
 }
