@@ -48,12 +48,26 @@ blogsRouter.post('/api/blogs', async (request, response, next) => {
   }  
 })
 
-blogsRouter.delete('/api/blogs/:id', async(request, response) => {
+blogsRouter.delete('/api/blogs/:id', async(request, response, next) => {
   try {
-    await Blog.findByIdAndDelete(request.params.id)
-    response.status(204).end()
-  } catch(exception) {
-    logger.error(exception)
+    const decodedToken = jwt.verify(request.body.token, process.env.SECRET)
+  
+    if(!decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid' })
+    }
+
+    const loggedUser = await User.findById(decodedToken.id)
+    const blogToDelete = await Blog.findById(request.params.id)
+
+    if( loggedUser.id.toString() === blogToDelete.user.toString()) {
+      await blogToDelete.delete()
+      response.status(204).json(blogToDelete)
+    } else {
+      response.status(401).json({ error: 'can´t delete a blog belonging to other user'})
+    }  
+    
+  } catch(error) {
+    next(error)
   }
 })
 
