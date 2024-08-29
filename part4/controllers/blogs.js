@@ -3,10 +3,11 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 const logger = require('../utils/logger')
 const jwt = require('jsonwebtoken')
-// const { tokenExtractor } = require('../utils/middleware')
+const middleware = require('../utils/middleware')
 
-blogsRouter.get('/api/blogs', async (request, response) => {
 
+blogsRouter.get('/', async (request, response) => {
+console.log('asdasd')
   try {
     const blogs = await Blog
       .find({})
@@ -17,17 +18,12 @@ blogsRouter.get('/api/blogs', async (request, response) => {
   }     
 })
 
-blogsRouter.post('/api/blogs', async (request, response, next) => {
+blogsRouter.post('/', middleware.userExtractor,async (request, response, next) => {
     
   try {
     const body = request.body
-
-    const decodedToken = jwt.verify(request.body.token, process.env.SECRET)
-  
-    if(!decodedToken.id) {
-      return response.status(401).json({ error: 'token invalid' })
-    }
-    const user = await User.findById(decodedToken.id) 
+   
+    const user = await User.findById(request.body.userId) 
     const blog = new Blog({
       author: body.author,
       title: body.title,
@@ -48,30 +44,27 @@ blogsRouter.post('/api/blogs', async (request, response, next) => {
   }  
 })
 
-blogsRouter.delete('/api/blogs/:id', async(request, response, next) => {
+blogsRouter.delete('/:id', middleware.userExtractor, async(request, response, next) => {
+
   try {
-    const decodedToken = jwt.verify(request.body.token, process.env.SECRET)
-  
-    if(!decodedToken.id) {
-      return response.status(401).json({ error: 'token invalid' })
-    }
-
-    const loggedUser = await User.findById(decodedToken.id)
+    const loggedUser = await User.findById(request.body.userId) 
     const blogToDelete = await Blog.findById(request.params.id)
-
+    console.log(loggedUser)
     if( loggedUser.id.toString() === blogToDelete.user.toString()) {
       await blogToDelete.delete()
       response.status(204).json(blogToDelete)
     } else {
       response.status(401).json({ error: 'can´t delete a blog belonging to other user'})
     }  
-    
-  } catch(error) {
+  } catch (error) {
     next(error)
   }
+    
+    
+  
 })
 
-blogsRouter.put('/api/blogs/:id', async(request, response) => {
+blogsRouter.put('/:id', async(request, response) => {
   
    const blog = {   
     likes: request.body.likes

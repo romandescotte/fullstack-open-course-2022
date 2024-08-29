@@ -1,4 +1,6 @@
 const logger = require('./logger')
+const jwt = require('jsonwebtoken')
+const User = require('../models/user')
 
 const requestLogger = (request, response, next) => {
   logger.info('Method:', request.method)
@@ -17,8 +19,7 @@ const errorHandler = (error, request, response, next) => {
     return response.status(400).json({ error: error.message })
   } else if(error.name === 'MongoServerError' && error.message.includes('E11000 duplicate key error')) {    
     const res = response.status(400).json({ error: 'expected `username` to be unique' })
-    //pregunta: como puedo recuperar este error en back o front end??
-    //logger.error(res)    
+  
     return res
   } else if (error.name ===  'JsonWebTokenError') {
     return response.status(401).json({ error: 'token invalid' })
@@ -36,8 +37,18 @@ const tokenExtractor = (request, response, next) => {
   next()
 }
 
+const userExtractor = (request, response, next) => {
+    const decodedToken = jwt.verify(request.body.token, process.env.SECRET)
+    if(!decodedToken.id) {
+      return response.status(401).json({ error: 'token invalid' })
+    }
+    request.body.userId = decodedToken.id   
+    next()
+}
+
 module.exports = { 
   requestLogger,
   errorHandler,
-  tokenExtractor
+  tokenExtractor,
+  userExtractor
 }
