@@ -2,12 +2,11 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const logger = require('../utils/logger')
-const jwt = require('jsonwebtoken')
 const middleware = require('../utils/middleware')
 
 
 blogsRouter.get('/', async (request, response) => {
-console.log('asdasd')
+
   try {
     const blogs = await Blog
       .find({})
@@ -21,23 +20,32 @@ console.log('asdasd')
 blogsRouter.post('/', middleware.userExtractor,async (request, response, next) => {
     
   try {
-    const body = request.body
+    const { body } = request
+    const { userId } = body    
+    // en la request viene el token Y el userId
+    console.log('body', body)
    
-    const user = await User.findById(request.body.userId) 
     const blog = new Blog({
       author: body.author,
       title: body.title,
       url: body.url,
       likes: body.likes || 0,
-      user: user.id
+      user: userId
     })
+
     if(!blog.title || !blog.url) {
-      response.status(400).json({error: "No title or url present"})
+      return response.status(400).json({error: "No title or url present"})
     } 
+       
     const savedBlog = await blog.save()
+    const user = await User.findOne({ _id: userId })
+    if(!user) {
+      return response.status(400).json({error: "No user found"})
+    }
+    
     user.blogs = user.blogs.concat(savedBlog._id)
     const savedUser = await user.save()   
-    response.status(201).json(savedBlog)
+    response.status(201).json(savedBlog)   
 
   } catch(error) {    
     next(error)

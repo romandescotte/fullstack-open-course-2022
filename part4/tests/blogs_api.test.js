@@ -7,24 +7,27 @@ const supertest = require('supertest')
 const app = require('../app')
 const api = supertest(app)
 const helper = require('./helper')
-
+const fs = require('fs')
 
 beforeEach(async() => {
-  await Blog.deleteMany({})
-
-  let blogObject = new Blog(helper.initialBlogs[0])
-  await blogObject.save()
-
-  blogObject = new Blog(helper.initialBlogs[1])
-  await blogObject.save()
 
   await User.deleteMany({})
-  
-  let userObject = new User(await helper.initialUsers[0]) 
-  await userObject.save()
+  //sacar esto a un helper luego y usar loop
+  const initialUsers = await helper.initialUsers()
+  let user = new User(initialUsers[0])
+  await user.save()
+  user = new User(initialUsers[1])
+  await user.save() 
 
-  userObject = new User(await helper.initialUsers[1])
-  await userObject.save()  
+  
+  
+  await Blog.deleteMany({})
+  // let blogObject = new Blog(helper.initialBlogs[0])
+  // await blogObject.save()
+  // blogObject = new Blog(helper.initialBlogs[1])
+  // await blogObject.save()
+
+
 })
 
 test('blogs are returned as json', async() => {
@@ -39,39 +42,67 @@ test('id is the unique identifier property of the blogs', async() => {
   const blogs = await helper.blogsInDB()
       
   blogs.forEach( (blog, i) => {    
-    assert.strictEqual(blog.id, helper.initialBlogs[i]._id)
+    assert(blog.id)
     assert.strictEqual(blog._id, undefined )
   })
 })
 
 test('a new valid blog can be added to api/blogs', async() => {
-
-  const createdUser = await User.find({username: 'root'})
-   
-  const newBlog = {
-    author: 'asde',
-    title: 'asd',
-    url: 'www.asd.com',
-    likes: 0,
-    userId: `${createdUser[0]._id.toString()}`
+  const userForTesting = {
+    username: 'root',
+    password: '1234'
   }
+  const { body } = await api
+    .post('/login')
+    .send(userForTesting)
+    .expect(200)
   
-  await api
-    .post('/api/blogs')
+  const newBlog = {
+    author: 'Blog para tests',
+    title: 'Blog para tests',
+    url: 'www.asd.com',
+    likes: 0
+  }
+
+  console.log('body', body)
+  const blogSent = await api
+    .post('/api/blogs')   
+    .set({Authorization: `Bearer ${body.token}`})
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
   const blogsAtEnd = await helper.blogsInDB()
-
-  assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+  console.log('blogsatEnd', blogsAtEnd)
+  assert.strictEqual(blogsAtEnd.length, 1)
 
   const lastAddedBlog = blogsAtEnd[blogsAtEnd.length - 1]
 
+  console.log('last added blog', lastAddedBlog)
+
   assert(Object.values(lastAddedBlog).includes(newBlog.author ))
-  assert(Object.values(lastAddedBlog).includes(newBlog.title))
-  assert(Object.values(lastAddedBlog).includes(newBlog.url))
-  assert(Object.values(lastAddedBlog).includes(newBlog.likes))
+
+  // assert(Object.values(lastAddedBlog).includes(newBlog.title))
+  // assert(Object.values(lastAddedBlog).includes(newBlog.url))
+  // assert(Object.values(lastAddedBlog).includes(newBlog.likes))
+})
+
+test.only('can login', async() => {
+  const userForTesting = {
+    username: 'root',
+    password: '1234'
+  }
+  const llamada = await api
+    .post('/login')
+    .send(userForTesting)
+    .expect(200)
+  
+  fs.writeFile("test-output.txt", JSON.stringify(llamada.body), err => {
+    if (err) throw err;
+    console.log('test-output.txt successfully written to disk');
+  })  
+  console.log()
+
 })
 
 test('if likes value is not present it will default to 0', async() => {

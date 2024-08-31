@@ -1,6 +1,7 @@
 const logger = require('./logger')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
+const fs = require('fs')
 
 const requestLogger = (request, response, next) => {
   logger.info('Method:', request.method)
@@ -23,8 +24,11 @@ const errorHandler = (error, request, response, next) => {
     return res
   } else if (error.name ===  'JsonWebTokenError') {
     return response.status(401).json({ error: 'token invalid' })
-  } 
+  } else if (error.name === 'TypeError') {
+    return response.status(404).json({ error: `${error.stack}`})
+  }
   next(error)
+  
 }
 
 const tokenExtractor = (request, response, next) => {
@@ -39,10 +43,15 @@ const tokenExtractor = (request, response, next) => {
 
 const userExtractor = (request, response, next) => {
     const decodedToken = jwt.verify(request.body.token, process.env.SECRET)
+  
     if(!decodedToken.id) {
       return response.status(401).json({ error: 'token invalid' })
     }
     request.body.userId = decodedToken.id   
+    fs.writeFile('request.txt', JSON.stringify(request.body), err => {
+      if (err) throw err;
+      console.log('request.txt successfully written to disk');
+    })
     next()
 }
 

@@ -26,8 +26,9 @@ app.use(cors())
 app.use(express.json())
 
 app.use(middleware.requestLogger)
-app.use(middleware.tokenExtractor)
-
+app.use(middleware.tokenExtractor) //mete el token en la request
+//luego pasa por userExtractor quien mete el userId en la request
+//luego a blogsRouter
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
 app.use('/login', loginRouter)

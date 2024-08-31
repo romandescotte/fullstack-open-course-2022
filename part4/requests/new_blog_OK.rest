@@ -1,6 +1,6 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: 
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoicm9vdCIsImlkIjoiNjZkMzliZDJkYWNiNTQzNTNhZTQ2NzNhIiwiaWF0IjoxNzI1MTQ0NDk5fQ.lcjCJOYUVRGGiSi1AN9H7V2ln_zxJD_mywnYG5LfOek
 
 {
 	"author": "Roman",	
