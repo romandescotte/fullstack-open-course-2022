@@ -22,8 +22,7 @@ blogsRouter.post('/', middleware.userExtractor,async (request, response, next) =
   try {
     const { body } = request
     const { userId } = body    
-    // en la request viene el token Y el userId
-    console.log('body', body)
+    // en la request viene el token Y el userId    
    
     const blog = new Blog({
       author: body.author,
@@ -53,36 +52,38 @@ blogsRouter.post('/', middleware.userExtractor,async (request, response, next) =
 })
 
 blogsRouter.delete('/:id', middleware.userExtractor, async(request, response, next) => {
-
   try {
     const loggedUser = await User.findById(request.body.userId) 
-    const blogToDelete = await Blog.findById(request.params.id)
-    console.log(loggedUser)
+    const blogToDelete = await Blog.findById(request.params.id)    
     if( loggedUser.id.toString() === blogToDelete.user.toString()) {
       await blogToDelete.delete()
       response.status(204).json(blogToDelete)
     } else {
-      response.status(401).json({ error: 'can´t delete a blog belonging to other user'})
+      response.status(401).json({ error: 'token not valid'})
     }  
   } catch (error) {
     next(error)
   }
-    
-    
-  
 })
 
-blogsRouter.put('/:id', async(request, response) => {
-  
-   const blog = {   
-    likes: request.body.likes
-  }
-
+blogsRouter.put('/:id', middleware.userExtractor, async(request, response, next) => {
   try {
-    const updatedNote = await Blog.findByIdAndUpdate(request.params.id, blog, {new: true})
-    response.status(201).json(updatedNote)
-  } catch(exception) {
-    logger.error(exception)
+    const blog = {   
+      likes: request.body.likes
+    }
+    const loggedUser = await User.findById(request.body.userId)  
+    const blogToUpdate = await Blog.findById(request.params.id)
+    logger.info(loggedUser)
+    logger.info(blogToUpdate)
+
+    if( loggedUser.id.toString() === blogToUpdate.user.toString()) {
+      const updatedNote = await Blog.findByIdAndUpdate(request.params.id, blog, {new: true})
+      response.status(201).json(updatedNote)
+    } else {
+      response.status(401).json({ error: 'token not valid'})
+    }    
+  } catch(error) {
+   next(error)
   }
 })
 
