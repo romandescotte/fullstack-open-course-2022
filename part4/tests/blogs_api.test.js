@@ -8,7 +8,6 @@ const app = require('../app')
 const api = supertest(app)
 const helper = require('./helper')
 
-//remover try catch y usar ese plugin de errores https://fullstackopen.com/en/part4/testing_the_backend#eliminating-the-try-catch
 beforeEach(async() => {
   await Blog.deleteMany({})  
   await User.deleteMany({}) 

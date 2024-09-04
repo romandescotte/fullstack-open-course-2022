@@ -9,9 +9,7 @@ usersRouter.get('/', async(req, res) => {
   res.json(users)
 })
 
-usersRouter.post('/', async(req, res, next) => {
-
-  try {
+usersRouter.post('/', async(req, res) => {  
     const { username, password, name } = req.body
 
     if(password.length < 3) {    
@@ -29,11 +27,7 @@ usersRouter.post('/', async(req, res, next) => {
       name
     })
     const savedUser = await user.save()
-    res.status(201).json(savedUser)     
-
-  } catch(error) {      
-    next(error)
-  }
+    res.status(201).json(savedUser)
 })
 
 module.exports = usersRouter

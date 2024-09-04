@@ -5,8 +5,7 @@ const User = require('../models/user')
 const config = require('../utils/config')
 
 loginRouter.post('/', async(req, res) => {
-  
-  try {
+    
     const { username, password } = req.body
 
     const user = await User.findOne({username}) 
@@ -28,11 +27,7 @@ loginRouter.post('/', async(req, res) => {
 
     res
       .status(200)
-      .send({token, username: user.username, name: user.name})
-  }
-  catch (error) {
-    next(error)
-  }
+      .send({token, username: user.username, name: user.name}) 
 })
 
 

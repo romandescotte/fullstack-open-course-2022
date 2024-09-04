@@ -6,20 +6,15 @@ const middleware = require('../utils/middleware')
 
 
 blogsRouter.get('/', async (request, response) => {
-
-  try {
-    const blogs = await Blog
-      .find({})
-      .populate('user', {username: 1, name: 1})
-    response.json(blogs)
-  } catch(exception) {
-    logger.error(exception)
-  }     
+ 
+  const blogs = await Blog
+    .find({})
+    .populate('user', {username: 1, name: 1})
+  response.json(blogs)  
 })
 
-blogsRouter.post('/', middleware.userExtractor,async (request, response, next) => {
-    
-  try {
+blogsRouter.post('/', middleware.userExtractor,async (request, response) => {    
+ 
     const { body } = request
     const { userId } = body    
     // en la request viene el token Y el userId    
@@ -45,14 +40,9 @@ blogsRouter.post('/', middleware.userExtractor,async (request, response, next) =
     user.blogs = user.blogs.concat(savedBlog._id)
     const savedUser = await user.save()   
     response.status(201).json(savedBlog)   
-
-  } catch(error) {    
-    next(error)
-  }  
 })
 
-blogsRouter.delete('/:id', middleware.userExtractor, async(request, response, next) => {
-  try {
+blogsRouter.delete('/:id', middleware.userExtractor, async(request, response) => { 
     const loggedUser = await User.findById(request.body.userId) 
     const blogToDelete = await Blog.findById(request.params.id)    
     if( loggedUser.id.toString() === blogToDelete.user.toString()) {
@@ -61,13 +51,10 @@ blogsRouter.delete('/:id', middleware.userExtractor, async(request, response, ne
     } else {
       response.status(401).json({ error: 'token not valid'})
     }  
-  } catch (error) {
-    next(error)
-  }
 })
 
-blogsRouter.put('/:id', middleware.userExtractor, async(request, response, next) => {
-  try {
+blogsRouter.put('/:id', middleware.userExtractor, async(request, response) => {
+ 
     const blog = {   
       likes: request.body.likes
     }
@@ -81,10 +68,7 @@ blogsRouter.put('/:id', middleware.userExtractor, async(request, response, next)
       response.status(201).json(updatedNote)
     } else {
       response.status(401).json({ error: 'token not valid'})
-    }    
-  } catch(error) {
-   next(error)
-  }
+    }     
 })
 
 
