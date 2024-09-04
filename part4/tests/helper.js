@@ -6,17 +6,17 @@ const app = require('../app')
 const api = supertest(app)
 
 const initialBlogs = [
-  {   
-    title: "React patterns",
-    author: "Michael Chan",
-    url: "https://reactpatterns.com/",
+  {
+    title: 'React patterns',
+    author: 'Michael Chan',
+    url: 'https://reactpatterns.com/',
     likes: 7,
     user: undefined
   },
   {
-    title: "Go To Statement Considered Harmful",
-    author: "Edsger W. Dijkstra",
-    url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+    title: 'Go To Statement Considered Harmful',
+    author: 'Edsger W. Dijkstra',
+    url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
     likes: 5,
     user: undefined
   }
@@ -35,7 +35,7 @@ const initialUsers = async() =>  {
       name: 'Romancete'
     }
   ]
-  return users 
+  return users
 }
 
 const blogsInDB = async () => {
@@ -49,11 +49,11 @@ const usersInDB = async () => {
 }
 
 const createUsers = async () => {
-    const users = await initialUsers()
-    let user = new User(users[0])
-    await user.save()
-    user = new User(users[1])
-    await user.save()
+  const users = await initialUsers()
+  let user = new User(users[0])
+  await user.save()
+  user = new User(users[1])
+  await user.save()
 }
 
 const logValidUser = async() => {
@@ -81,25 +81,25 @@ const logInvalidUser = async() => {
 
 const createBlog = async() => {
   await createUsers()
-  const user = await logValidUser()    
-    
+  const user = await logValidUser()
+
   const newBlog = {
     author: 'test maniac',
     title: 'blog for testing',
     url: 'www.testtesttest.com',
     likes: 7357
   }
-  
+
   await api
-    .post('/api/blogs')   
-    .set({Authorization: `Bearer ${user.token}`})
+    .post('/api/blogs')
+    .set({ Authorization: `Bearer ${user.token}` })
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 }
 
 module.exports = {
-  initialBlogs, 
+  initialBlogs,
   initialUsers,
   blogsInDB,
   usersInDB,

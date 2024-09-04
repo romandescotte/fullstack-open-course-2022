@@ -6,7 +6,8 @@
   "scripts": {
     "start": "cross-env NODE_ENV=production node index.js",
     "test": "cross-env NODE_ENV=test node --test",
-    "dev": "cross-env NODE_ENV=development nodemon index.js"
+    "dev": "cross-env NODE_ENV=development nodemon index.js",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +24,10 @@
     "mongoose": "6.12.2"
   },
   "devDependencies": {
+    "@eslint/js": "^9.9.1",
+    "@stylistic/eslint-plugin-js": "^2.7.2",
+    "eslint": "^9.9.1",
+    "globals": "^15.9.0",
     "nodemon": "3.0.1",
     "supertest": "^7.0.0"
   },
