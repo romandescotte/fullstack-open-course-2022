@@ -7,7 +7,6 @@ const app = require('../app')
 const api = supertest(app)
 const helper = require('./helper')
 
-
 describe('when there is initially one or more user in db', () => {
   beforeEach(async() => {
     await User.deleteMany({})  

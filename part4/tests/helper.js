@@ -1,6 +1,9 @@
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
+const supertest = require('supertest')
+const app = require('../app')
+const api = supertest(app)
 
 const initialBlogs = [
   {   
@@ -20,7 +23,7 @@ const initialBlogs = [
 ]
 
 const initialUsers = async() =>  {
-  const users =  [
+  const users = [
     {
       username: 'root',
       passwordHash: await bcrypt.hash('1234', 10),
@@ -32,7 +35,7 @@ const initialUsers = async() =>  {
       name: 'Romancete'
     }
   ]
-  return users
+  return users 
 }
 
 const blogsInDB = async () => {
@@ -45,9 +48,63 @@ const usersInDB = async () => {
   return users.map(user => user.toJSON())
 }
 
+const createUsers = async () => {
+    const users = await initialUsers()
+    let user = new User(users[0])
+    await user.save()
+    user = new User(users[1])
+    await user.save()
+}
+
+const logValidUser = async() => {
+  const userForTesting = {
+    username: 'root',
+    password: '1234'
+  }
+  const { body } = await api
+    .post('/login')
+    .send(userForTesting)
+
+  return body
+}
+
+const logInvalidUser = async() => {
+  const userForTesting = {
+    username: 'root',
+    password: '1235'
+  }
+  const { body } = await api
+    .post('/login')
+    .send(userForTesting)
+  return body
+}
+
+const createBlog = async() => {
+  await createUsers()
+  const user = await logValidUser()    
+    
+  const newBlog = {
+    author: 'test maniac',
+    title: 'blog for testing',
+    url: 'www.testtesttest.com',
+    likes: 7357
+  }
+  
+  await api
+    .post('/api/blogs')   
+    .set({Authorization: `Bearer ${user.token}`})
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+}
+
 module.exports = {
   initialBlogs, 
   initialUsers,
   blogsInDB,
-  usersInDB
+  usersInDB,
+  createUsers,
+  logValidUser,
+  logInvalidUser,
+  createBlog
 }
